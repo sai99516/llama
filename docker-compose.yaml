@@ -1,0 +1,29 @@
+version: '3'  # Use version 3 for compatibility with Docker Compose
+
+services:
+  llama-stack:
+    image: ollama/ollama  # Image for Llama Stack
+    container_name: llama-stack-container
+    ports:
+      - "5002:5002"  # Expose inference API on port 5002
+      - "11436:11436"  # Port for the agent API (same port, no change)
+    environment:
+      - OLLAMA_URL=http://127.0.0.1:11436  # Fixed agent API URL (port 11436)
+      - INFERENCE_MODEL=${INFERENCE_MODEL}  # Use model from .env file
+      - SQLITE_STORE_DIR=${SQLITE_STORE_DIR}  # Path to SQLite directory
+    volumes:
+      - /path/to/llama-stack-data:/data  # Optional: persist data for LlamaStack
+
+  llama-agent:
+    image: ollama/ollama  # Same image for the agent
+    container_name: llama-agent-container
+    ports:
+      - "11437:11434"  # Change port for the agent API (port 11437)
+    environment:
+      - BRAVE_SEARCH_API_KEY=${BRAVE_SEARCH_API_KEY}  # API Key for Brave Search
+      - SQLITE_STORE_DIR=${SQLITE_STORE_DIR}  # Path to SQLite store
+      - OLLAMA_URL=http://127.0.0.1:5002  # Connect to LlamaStack at port 5002 (inference API)
+    volumes:
+      - /path/to/llama-agent-data:/data  # Optional: persist agent data
+    depends_on:
+      - llama-stack  # Ensure LlamaStack is ready before starting the agent

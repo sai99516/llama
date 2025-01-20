@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Query Model</title>
+</head>
+<body>
+    <h1>Ask the Model a Question</h1>
+
+    <!-- Form for submitting queries -->
+    <form id="queryForm">
+        <label for="user_query">Your Query:</label><br>
+        <input type="text" id="user_query" name="user_query" required><br><br>
+        <input type="submit" value="Submit">
+    </form>
+
+    <h2>Model Response:</h2>
+    <div id="response"></div>
+
+    <script>
+        // Handle form submission
+        document.getElementById("queryForm").addEventListener("submit", async function (e) {
+            e.preventDefault();  // Prevent default form submission
+
+            const query = document.getElementById("user_query").value;
+            const responseDiv = document.getElementById("response");
+
+            // Send query to the backend using a POST request
+            const response = await fetch('/query', {
+                method: 'POST',
+                body: new URLSearchParams({
+                    'user_query': query
+                }),
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            });
+
+            // Handle response
+            const data = await response.json();
+            responseDiv.innerHTML = '';  // Clear previous response
+
+            // Display each line of the model response
+            data.forEach(item => {
+                responseDiv.innerHTML += `<p>${item}</p>`;
+            });
+        });
+    </script>
+</body>
+</html>
+ 
